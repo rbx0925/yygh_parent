@@ -11,4 +11,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Description
  */
 public interface HospitalSetService extends IService<HospitalSet> {
+    /**
+     * 获取签名key
+     * @param hoscode
+     * @return
+     */
+    String getSignKey(String hoscode);
 }
