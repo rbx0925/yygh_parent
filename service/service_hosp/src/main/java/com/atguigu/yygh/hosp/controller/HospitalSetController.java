@@ -27,7 +27,7 @@ import java.util.List;
 @Api(description = "医院设置接口")
 @RestController
 @RequestMapping("/admin/hosp/hospitalSet")
-@CrossOrigin
+//@CrossOrigin
 public class HospitalSetController {
     @Autowired
     private HospitalSetService hospitalSetService;
@@ -53,7 +53,7 @@ public class HospitalSetController {
     @GetMapping("/findAll")
     public R findAll(){
         try {
-            System.out.println(10/0);
+            //System.out.println(10/0);
         } catch (Exception e) {
             throw new YyghException(20001,"自定义异常处理");
         }

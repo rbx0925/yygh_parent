@@ -14,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,6 +86,47 @@ public class DictServiceImpl extends ServiceImpl<DictMapper, Dict> implements Di
             e.printStackTrace();
             throw new YyghException(20001,"导入数据失败");
         }
+    }
+
+    @Override
+    public String getNameByParentDictCodeAndValue(String parentDictCode, String value) {
+        //1.判断是国标数据还是自定义数据
+        if (StringUtils.isEmpty(parentDictCode)){
+            //2.实现国标数据翻译
+            Dict dict = baseMapper.selectOne(new QueryWrapper<Dict>().eq("value", value));
+            if (dict != null){
+                return dict.getName();
+            }
+        }else {
+            //3.实现自定义数据翻译
+            //3.1根据数据字典编码查询上级数据
+            Dict parentDict = this.getDictByDictCode(parentDictCode);
+            if (parentDict == null){
+                return "";
+            }
+            //3.2根据上级id+value查询字典数据
+            Dict dict = baseMapper.selectOne(new QueryWrapper<Dict>().eq("parent_id",parentDict.getId()).eq("value", value));
+            if (dict != null){
+                return dict.getName();
+            }
+        }
+        return "";
+    }
+
+    @Override
+    public List<Dict> findByDictCode(String dictCode) {
+        Dict parentDict = this.getDictByDictCode(dictCode);
+        if (parentDict==null){
+            throw new YyghException(20001,"获取下级节点失败");
+        }
+        List<Dict> list = this.findChildData(parentDict.getId());
+        return list;
+    }
+
+    //根据字典编码查询数据
+    private Dict getDictByDictCode(String parentDictCode) {
+        Dict dict = baseMapper.selectOne(new QueryWrapper<Dict>().eq("dict_code", parentDictCode));
+        return dict;
     }
 
     private boolean isChild(Long id) {
