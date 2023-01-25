@@ -6,6 +6,7 @@ import com.atguigu.yygh.hosp.repository.DepartmentRepository;
 import com.atguigu.yygh.hosp.service.DepartmentService;
 import com.atguigu.yygh.model.hosp.Department;
 import com.atguigu.yygh.vo.hosp.DepartmentQueryVo;
+import com.atguigu.yygh.vo.hosp.DepartmentVo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author rbx
@@ -83,5 +87,33 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
     }
 
-
+    @Override
+    public List<DepartmentVo> findDeptTree(String hoscode) {
+        //1.创建返回对象
+        List<DepartmentVo> result = new ArrayList<>();
+        //2.根据参数hoscode查询所有科室信息
+        List<Department> departmentList = departmentRepository.getByHoscode(hoscode);
+        //3.所有科室信息进行数据分组,根据大科室编号进行分组
+        //List<Department> => Map<bigcode,List<Department>>
+        Map<String,List<Department>> departmentMap = departmentList.stream().collect(Collectors.groupingBy(Department::getBigcode));
+        //4.遍历Map封装大科室信息DepartmentVo
+        for (Map.Entry<String, List<Department>> entry : departmentMap.entrySet()) {
+            DepartmentVo bigDepVo = new DepartmentVo();
+            bigDepVo.setDepcode(entry.getKey());
+            bigDepVo.setDepname(entry.getValue().get(0).getDepname());
+            //5.封装小科室信息List<DepartmentVo>
+            List<DepartmentVo> depVoList = new ArrayList<>();
+            List<Department> depList = entry.getValue();
+            for (Department department : depList) {
+                DepartmentVo departmentVo = new DepartmentVo();
+                BeanUtils.copyProperties(department, departmentVo);
+                depVoList.add(departmentVo);
+            }
+            //6.封装好的小科室集合存入大科室对象
+            bigDepVo.setChildren(depVoList);
+            //7.把大科室对象存入最终返回对象
+            result.add(bigDepVo);
+        }
+        return result;
+    }
 }

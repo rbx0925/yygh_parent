@@ -123,6 +123,15 @@ public class HospitalServiceImpl implements HospitalService {
         return map;
     }
 
+    @Override
+    public String getHospName(String hoscode) {
+        Hospital targetHospital = hospitalRepository.getByHoscode(hoscode);
+        if (targetHospital == null) {
+            throw new YyghException(20001,"医院信息有误");
+        }
+        return targetHospital.getHosname();
+    }
+
     //翻译医院信息
     private Hospital packHospital(Hospital hospital) {
         String hosTypeString = dictFeignClient.getName(DictEnum.HOSTYPE.getDictCode(), hospital.getHostype());
