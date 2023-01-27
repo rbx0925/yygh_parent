@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -130,6 +131,26 @@ public class HospitalServiceImpl implements HospitalService {
             throw new YyghException(20001,"医院信息有误");
         }
         return targetHospital.getHosname();
+    }
+
+    @Override
+    public List<Hospital> findByHosnameLike(String hosname) {
+        List<Hospital> list = hospitalRepository.getByHosnameLike(hosname);
+        return list;
+    }
+
+    @Override
+    public Map<String, Object> getHospInfo(String hoscode) {
+        //1.查询数据翻译字段
+        Hospital hospital = this.packHospital(hospitalRepository.getByHoscode(hoscode));
+        //2.取出预约规则
+        BookingRule bookingRule = hospital.getBookingRule();
+        hospital.setBookingRule(null);
+        //3.封装结果返回
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("hospital",hospital);
+        map.put("bookingRule", bookingRule);
+        return map;
     }
 
     //翻译医院信息
