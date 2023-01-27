@@ -2,14 +2,17 @@ package com.atguigu.yygh.hosp.controller;
 
 import com.atguigu.yygh.common.R;
 import com.atguigu.yygh.hosp.service.ScheduleService;
+import com.atguigu.yygh.model.hosp.Schedule;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,5 +37,15 @@ public class ScheduleController {
                              @PathVariable String depcode) {
         Map<String,Object> map = scheduleService.getScheduleRule(page, limit, hoscode,depcode);
         return R.ok().data(map);
+    }
+
+    //根据医院编号 、科室编号和工作日期，查询排班详细信息
+    @ApiOperation(value = "查询排班详细信息")
+    @GetMapping("getScheduleDetail/{hoscode}/{depcode}/{workDate}")
+    public R getScheduleDetail( @PathVariable String hoscode,
+                                @PathVariable String depcode,
+                                @PathVariable String workDate) {
+        List<Schedule> list = scheduleService.getScheduleDetail(hoscode, depcode, new DateTime(workDate).toDate());
+        return R.ok().data("list",list);
     }
 }

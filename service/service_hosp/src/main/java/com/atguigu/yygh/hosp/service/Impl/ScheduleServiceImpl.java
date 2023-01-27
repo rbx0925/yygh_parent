@@ -2,6 +2,7 @@ package com.atguigu.yygh.hosp.service.Impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atguigu.yygh.hosp.repository.ScheduleRepository;
+import com.atguigu.yygh.hosp.service.DepartmentService;
 import com.atguigu.yygh.hosp.service.HospitalService;
 import com.atguigu.yygh.hosp.service.ScheduleService;
 import com.atguigu.yygh.model.hosp.Department;
@@ -40,6 +41,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private HospitalService hospitalService;
+
+    @Autowired
+    private DepartmentService departmentService;
 
     @Override
     public void save(Map<String, Object> paraMap) {
@@ -115,6 +119,30 @@ public class ScheduleServiceImpl implements ScheduleService {
         baseMap.put("hosname",hosName);
         result.put("baseMap",baseMap);
         return result;
+    }
+
+    @Override
+    public List<Schedule> getScheduleDetail(String hoscode, String depcode, Date workDate) {
+        //1.根据条件查询数据
+        List<Schedule> list = scheduleRepository.getByHoscodeAndDepcodeAndWorkDate(hoscode, depcode,workDate);
+        //2.遍历集合翻译字段
+        list.forEach(item->{
+            this.packSchedule(item);
+        });
+        return list;
+    }
+
+    //翻译字段
+    private Schedule packSchedule(Schedule schedule) {
+        //设置医院名称
+        schedule.getParam().put("hosname",hospitalService.getHospName(schedule.getHoscode()));
+        //设置科室名称
+        schedule.getParam().put("depname",
+                departmentService.getDepName(schedule.getHoscode(),schedule.getDepcode()));
+        //设置日期对应星期
+        schedule.getParam().put("dayOfWeek",this.getDayOfWeek(new DateTime(schedule.getWorkDate())));
+
+        return schedule;
     }
 
     /**

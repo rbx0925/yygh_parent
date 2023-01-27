@@ -2,6 +2,7 @@ package com.atguigu.yygh.hosp.service.Impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.atguigu.yygh.common.Result;
+import com.atguigu.yygh.common.handler.YyghException;
 import com.atguigu.yygh.hosp.repository.DepartmentRepository;
 import com.atguigu.yygh.hosp.service.DepartmentService;
 import com.atguigu.yygh.model.hosp.Department;
@@ -115,5 +116,14 @@ public class DepartmentServiceImpl implements DepartmentService {
             result.add(bigDepVo);
         }
         return result;
+    }
+
+    @Override
+    public String getDepName(String hoscode, String depcode) {
+        Department department = departmentRepository.getByHoscodeAndDepcode(hoscode,depcode);
+        if (department==null){
+            throw new YyghException(20001,"科室信息有误");
+        }
+        return department.getDepname();
     }
 }
