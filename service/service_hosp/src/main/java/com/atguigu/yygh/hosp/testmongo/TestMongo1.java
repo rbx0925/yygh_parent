@@ -73,6 +73,7 @@ public class TestMongo1 {
         Query query = new Query(
                 Criteria.where("name").regex(pattern)
         );
+
         List<User> users = mongoTemplate.find(query, User.class);
         users.forEach(System.out::println);
     }
