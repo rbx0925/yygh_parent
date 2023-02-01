@@ -41,7 +41,7 @@ public class WeixinApiController {
     /**
      * 获取微信登录参数
      */
-    @GetMapping("getLoginParam")
+    @GetMapping("/getLoginParam")
     @ResponseBody
     public R genQrConnect(HttpSession session) throws UnsupportedEncodingException {
         //处理回调地址
