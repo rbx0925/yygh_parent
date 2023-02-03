@@ -3,12 +3,15 @@ package com.atguigu.yygh.hosp.api;
 import com.atguigu.yygh.common.R;
 import com.atguigu.yygh.hosp.service.DepartmentService;
 import com.atguigu.yygh.hosp.service.HospitalService;
+import com.atguigu.yygh.hosp.service.ScheduleService;
 import com.atguigu.yygh.model.hosp.Hospital;
+import com.atguigu.yygh.model.hosp.Schedule;
 import com.atguigu.yygh.vo.hosp.DepartmentVo;
 import com.atguigu.yygh.vo.hosp.HospitalQueryVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +38,9 @@ public class HospitalApiController {
     private HospitalService hospitalService;
     @Autowired
     private DepartmentService departmentService;
-    
+
+    @Autowired
+    private ScheduleService scheduleService;
 
     @ApiOperation(value = "获取分页列表")
     @GetMapping("{page}/{limit}")
@@ -66,5 +72,33 @@ public class HospitalApiController {
     public R department(@PathVariable String hoscode) {
         List<DepartmentVo> list = departmentService.findDeptTree(hoscode);
         return R.ok().data("list",list);
+    }
+
+    @ApiOperation(value = "获取可预约排班数据")
+    @GetMapping("auth/getBookingScheduleRule/{page}/{limit}/{hoscode}/{depcode}")
+    public R getBookingSchedule(
+            @PathVariable Integer page,
+            @PathVariable Integer limit,
+            @PathVariable String hoscode,
+            @PathVariable String depcode) {
+        Map<String,Object> map = scheduleService.getBookingScheduleRule(page, limit, hoscode, depcode);
+        return R.ok().data("map",map);
+    }
+
+    @ApiOperation(value = "获取排班数据")
+    @GetMapping("auth/findScheduleList/{hoscode}/{depcode}/{workDate}")
+    public R findScheduleList(
+            @PathVariable String hoscode,
+            @PathVariable String depcode,
+            @PathVariable String workDate) {
+        List<Schedule> scheduleList = scheduleService.getScheduleDetail(hoscode, depcode, new DateTime(workDate).toDate());
+        return R.ok().data("scheduleList",scheduleList);
+    }
+
+    @ApiOperation(value = "根据排班id获取排班详情")
+    @GetMapping("getSchedule/{id}")
+    public R findScheduleById(@PathVariable String id ){
+        Schedule schedule = scheduleService.findScheduleById(id);
+        return R.ok().data("schedule",schedule);
     }
 }

@@ -126,4 +126,13 @@ public class DepartmentServiceImpl implements DepartmentService {
         }
         return department.getDepname();
     }
+
+    @Override
+    public Department getDepartment(String hoscode, String depcode) {
+        Department department = departmentRepository.getByHoscodeAndDepcode(hoscode,depcode);
+        if (department==null){
+            throw new YyghException(20001,"科室信息有误");
+        }
+        return department;
+    }
 }
