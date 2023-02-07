@@ -1,5 +1,7 @@
 package com.atguigu.yygh.msm.service;
 
+import com.atguigu.yygh.vo.msm.MsmVo;
+
 import java.util.Map;
 
 /**
@@ -11,4 +13,7 @@ import java.util.Map;
 public interface MsmService {
     //发送验码
     boolean send(String phone, Map<String, String> param);
+
+    //发送短信接口
+    boolean send(MsmVo msmVo);
 }

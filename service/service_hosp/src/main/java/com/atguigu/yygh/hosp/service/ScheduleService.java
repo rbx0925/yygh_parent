@@ -1,6 +1,7 @@
 package com.atguigu.yygh.hosp.service;
 
 import com.atguigu.yygh.model.hosp.Schedule;
+import com.atguigu.yygh.vo.hosp.ScheduleOrderVo;
 
 import java.util.Date;
 import java.util.List;
@@ -26,4 +27,14 @@ public interface ScheduleService {
 
     //根据排班id获取排班详情
     Schedule findScheduleById(String id);
+
+    //根据排班id获取预约下单数据
+    ScheduleOrderVo getScheduleOrderVo(String scheduleId);
+
+    /**
+     * 修改排班
+     */
+    void update(Schedule schedule);
+
+    Schedule getScheduleByIds(String hoscode, String scheduleId);
 }
